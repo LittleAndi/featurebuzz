@@ -5,7 +5,7 @@ import IdeaContainer from "./IdeaContainer";
 
 const Ideas = ({ socket }) => {
   const navigate = useNavigate();
-  const [ideas] = useState(generateRandomIdeas(15));
+  const [ideas, setIdeas] = useState([]);
 
   useEffect(() => {
     function authenticateUser() {
@@ -18,26 +18,12 @@ const Ideas = ({ socket }) => {
       }
     }
     authenticateUser();
-  }, [navigate]);
-
-  function generateRandomIdeas(numIdeas) {
-    const ideas = [];
-
-    for (let i = 1; i <= numIdeas; i++) {
-      const pitch = `Pitch for idea ${i}`;
-      const description = `The Elevator Pitch is a concise and compelling summary of idea ${i}, meant to capture someone's attention in a short amount of time. The Full Description could provide more context and detail.`;
-      const vote_count = Math.floor(Math.random() * 10);
-
-      ideas.push({
-        id: i,
-        pitch,
-        description,
-        vote_count,
-      });
-    }
-
-    return ideas;
-  }
+    socket.emit("allIdeas", "search");
+    socket.on("allIdeasMessage", (data) => {
+      console.log(data);
+      setIdeas(data.ideas);
+    });
+  }, [socket, navigate]);
 
   return (
     <>

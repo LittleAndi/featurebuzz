@@ -51,7 +51,7 @@ socketIO.on("connection", (socket) => {
         username,
         password,
         email,
-        images: [],
+        ideas: [],
       });
       return socket.emit("registerSuccess", "Account created successfully!");
     }
@@ -71,6 +71,18 @@ socketIO.on("connection", (socket) => {
     };
     result[0]?.ideas.unshift(newIdea);
     socket.emit("createIdeaMessage", "Idea created successfully!");
+  });
+
+  socket.on("allIdeas", (data) => {
+    let ideas = [];
+    console.log(database.length);
+    for (let i = 0; i < database.length; i++) {
+      ideas = ideas.concat(database[i]?.ideas);
+    }
+    socket.emit("allIdeasMessage", {
+      message: "Ideas retrieved successfully",
+      ideas: ideas,
+    });
   });
 
   socket.on("disconnect", () => {
