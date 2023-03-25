@@ -15,8 +15,48 @@ const socketIO = require("socket.io")(http, {
   },
 });
 
+const database = [];
+const generateID = () => Math.random().toString(36).substring(2, 10);
+
 socketIO.on("connection", (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
+
+  socket.on("login", (data) => {
+    //👇🏻 data - contains the username and password
+    const { username, password } = data;
+    let result = database.filter(
+      (user) => user.username === username && user.password === password
+    );
+    if (result.length !== 1) {
+      return socket.emit("loginError", "Incorrect credentials");
+    }
+    socket.emit("loginSuccess", {
+      message: "Login successfully",
+      data: {
+        _id: result[0].id,
+        _email: result[0].email,
+      },
+    });
+  });
+
+  socket.on("register", (data) => {
+    const { username, email, password } = data;
+    console.log(username);
+    let result = database.filter(
+      (user) => user.email === email || user.username === username
+    );
+    if (result.length === 0) {
+      database.push({
+        id: generateID(),
+        username,
+        password,
+        email,
+        images: [],
+      });
+      return socket.emit("registerSuccess", "Account created successfully!");
+    }
+    socket.emit("registerError", "User already exists");
+  });
 
   socket.on("disconnect", () => {
     socket.disconnect();
