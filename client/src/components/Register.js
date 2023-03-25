@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Register = ({ socket }) => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
@@ -11,12 +12,24 @@ const Register = ({ socket }) => {
   const handleRegister = (e) => {
     e.preventDefault();
     if (username.trim() && password.trim() && email.trim()) {
-      console.log({ username, email, password });
+      socket.emit("register", { username, email, password });
       setPassword("");
       setUsername("");
       setEmail("");
     }
   };
+
+  useEffect(() => {
+    socket.on("registerSuccess", (data) => {
+      toast.success(data, { toastId: "registerSuccess" });
+      //👇🏻 navigates to the login page
+      navigate("/");
+    });
+    socket.on("registerError", (error) => {
+      toast.error(error, { toastId: "registerError" });
+    });
+  }, [socket, navigate]);
+
   return (
     <div className="register">
       <h2 style={{ marginBottom: "30px" }}>Register</h2>

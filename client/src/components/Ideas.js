@@ -1,8 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Nav from "./Nav";
 import IdeaContainer from "./IdeaContainer";
 
 const Ideas = ({ socket }) => {
-  const [ideas] = useState(generateRandomIdeas(20));
+  const navigate = useNavigate();
+  const [ideas] = useState(generateRandomIdeas(15));
+
+  useEffect(() => {
+    function authenticateUser() {
+      const id = localStorage.getItem("_id");
+      /*
+        👇🏻 If ID is false, redirects the user to the login page
+        */
+      if (!id) {
+        navigate("/login");
+      }
+    }
+    authenticateUser();
+  }, [navigate]);
 
   function generateRandomIdeas(numIdeas) {
     const ideas = [];
@@ -24,10 +40,13 @@ const Ideas = ({ socket }) => {
   }
 
   return (
-    <div className="ideas">
-      <h2 style={{ marginBottom: "30px" }}>Ideas</h2>
-      <IdeaContainer ideas={ideas} />
-    </div>
+    <>
+      <Nav />
+      <div className="ideas">
+        <h2 style={{ marginBottom: "30px" }}>Ideas</h2>
+        <IdeaContainer ideas={ideas} />
+      </div>
+    </>
   );
 };
 

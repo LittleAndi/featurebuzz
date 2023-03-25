@@ -1,20 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Login = ({ socket }) => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSignIn = (e) => {
     if (username.trim() && password.trim()) {
       e.preventDefault();
-      console.log({ username, password });
+      socket.emit("login", { username, password });
       setPassword("");
       setUsername("");
     }
   };
+
+  useEffect(() => {
+    socket.on("loginSuccess", (data) => {
+      toast.success(data.message, { toastId: "loginSuccess" });
+      //👇🏻 Saves the user's id and email to local storage for easy identification & for making authorized requests
+      localStorage.setItem("_id", data.data._id);
+      localStorage.setItem("_myEmail", data.data._email);
+
+      //👇🏻 Redirects the user to the Ideas component
+      navigate("/");
+    });
+    //👇🏻 Notifies the user of the error message
+    socket.on("loginError", (error) => {
+      toast.error(error, { toastId: "loginError" });
+    });
+  }, [socket, navigate]);
+
   return (
     <div className="login">
       <h2 style={{ marginBottom: "30px" }}>Login</h2>
