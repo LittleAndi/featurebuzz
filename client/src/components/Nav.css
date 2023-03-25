@@ -1,0 +1,35 @@
+.navbar {
+  width: 100%;
+  min-height: 10vh;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #000;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.navbar h3 {
+  color: #fff;
+}
+.nav__BtnGroup a,
+.nav__BtnGroup button {
+  padding: 15px;
+  width: 200px;
+  font-size: 16px;
+  cursor: pointer;
+  outline: none;
+  background-color: #fff;
+  border: none;
+  border-radius: 3px;
+  text-decoration: none;
+}
+.nav__BtnGroup a {
+  margin-right: 10px;
+}
+.nav__BtnGroup a:hover,
+.nav__BtnGroup button:hover {
+  background-color: #666;
+  color: #fff;
+}
