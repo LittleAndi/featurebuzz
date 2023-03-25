@@ -58,6 +58,21 @@ socketIO.on("connection", (socket) => {
     socket.emit("registerError", "User already exists");
   });
 
+  socket.on("createIdea", (data) => {
+    const { id, email, pitch, description } = data;
+    let result = database.filter((user) => user.id === id);
+    const newIdea = {
+      id: generateID(),
+      pitch: pitch,
+      description: description,
+      vote_count: 0,
+      votedUsers: [],
+      _ref: email,
+    };
+    result[0]?.ideas.unshift(newIdea);
+    socket.emit("createIdeaMessage", "Idea created successfully!");
+  });
+
   socket.on("disconnect", () => {
     socket.disconnect();
     console.log("🔥: A user disconnected");

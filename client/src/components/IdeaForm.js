@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Nav from "./Nav";
+import { toast } from "react-toastify";
 
-function IdeaForm({ onSubmit }) {
+const IdeaForm = ({ socket }) => {
   const navigate = useNavigate();
   const [pitch, setPitch] = useState("");
   const [description, setDescription] = useState("");
@@ -17,12 +18,23 @@ function IdeaForm({ onSubmit }) {
         navigate("/login");
       }
     }
+    socket.on("createIdeaMessage", (data) => {
+      //👇🏻 Displays the server's response
+      toast.success(data, { toastId: "createIdeaMessage" });
+      navigate("/");
+    });
     authenticateUser();
-  }, [navigate]);
+  }, [socket, navigate]);
 
   function handleSubmit(e) {
     e.preventDefault();
-    onSubmit({ pitch, description });
+
+    //👇🏻 Gets the id and email from the local storage
+    const id = localStorage.getItem("_id");
+    const email = localStorage.getItem("_myEmail");
+
+    socket.emit("createIdea", { id, email, pitch, description });
+
     setPitch("");
     setDescription("");
   }
@@ -67,6 +79,6 @@ function IdeaForm({ onSubmit }) {
       </div>
     </>
   );
-}
+};
 
 export default IdeaForm;
