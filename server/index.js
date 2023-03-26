@@ -85,6 +85,41 @@ socketIO.on("connection", (socket) => {
     });
   });
 
+  socket.on("ideaUpvote", (data) => {
+    const { userId, ideaId } = data;
+    let ideas = [];
+    for (let i = 0; i < database.length; i++) {
+      if (!(database[i].id === userId)) {
+        ideas = ideas.concat(database[i]?.ideas);
+      }
+    }
+    const idea = ideas.filter((idea) => idea.id === ideaId);
+    if (idea.length < 1) {
+      return socket.emit("upvoteError", {
+        error_message: "You cannot upvote your own ideas",
+      });
+    }
+
+    const voters = idea[0]?.votedUsers;
+    const authenticateUpvote = voters.filter((voter) => voter === userId);
+    if (!authenticateUpvote.length) {
+      idea[0].vote_count += 1;
+      voters.push(userId);
+      socket.emit("allIdeasMessage", {
+        message: "Ideas retrieved successfully",
+        ideas: ideas,
+      });
+      return socket.emit("upvoteSuccess", {
+        message: "Upvote successful",
+        item: idea,
+      });
+    }
+
+    socket.emit("upvoteError", {
+      error_message: "Duplicate votes are not allowed",
+    });
+  });
+
   socket.on("disconnect", () => {
     socket.disconnect();
     console.log("🔥: A user disconnected");

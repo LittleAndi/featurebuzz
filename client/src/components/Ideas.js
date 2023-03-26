@@ -30,7 +30,7 @@ const Ideas = ({ socket }) => {
       <Nav />
       <div className="ideas">
         <h2 style={{ marginBottom: "30px" }}>Ideas</h2>
-        <IdeaContainer ideas={ideas} />
+        <IdeaContainer socket={socket} ideas={ideas} />
       </div>
     </>
   );

@@ -1,10 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { MdOutlineArrowUpward } from "react-icons/md";
+import { toast } from "react-toastify";
 import "./IdeaContainer.css";
 
 const IdeaContainer = ({ ideas, socket }) => {
+  useEffect(() => {
+    socket.on("upvoteSuccess", (data) => {
+      toast.success(data.message, { toastId: "upvoteSuccess" });
+      console.log(data.item[0]._ref);
+    });
+    socket.on("upvoteError", (data) => {
+      toast.error(data.error_message, { toastId: "upvoteError" });
+    });
+  }, [socket]);
+
   const handleUpvote = (id) => {
-    console.log("Upvote", id);
+    socket.emit("ideaUpvote", {
+      userId: localStorage.getItem("_id"),
+      ideaId: id,
+    });
   };
 
   return (
